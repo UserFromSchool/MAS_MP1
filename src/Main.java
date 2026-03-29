@@ -6,18 +6,25 @@ public class Main {
 
     public static void main(String[] argv) {
 
+        System.out.println("Method overloading (in constructor)");
         Employee emp1 = new Employee("Jack", "Jason", "jack.jason@gmail.com", 10_000, LocalDate.now(), new ArrayList<>());
         Employee emp2 = new Employee("Ana", "Ger", "ana.ger@gmail.com", 4_000, LocalDate.now(), new ArrayList<>(), 14903673);
+        System.out.println();
 
-        emp1.addPhoneNumber("507 407 307");
-        emp1.addPhoneNumber("800 900 800");
-        emp1.addPhoneNumber("100 100 100");
-        emp1.removePhoneNumber("507 407 307");
+
+        System.out.println("Initialization...");
+        emp1.addPhoneNumber("+48 507 407 307");
+        emp1.addPhoneNumber("+48 800 900 800");
+        emp1.addPhoneNumber("+48 100 100 100");
+        emp1.removePhoneNumber("+48 507 407 307");
+        System.out.println();
+
 
         System.out.println("Usage of normal attribute: ");
-        System.out.println(emp1.getName());
-        System.out.println(emp1.getSurname());
-        System.out.println(emp1.getEmail());
+        System.out.println("Name: " + emp1.getName());
+        System.out.println("Surname: " + emp1.getSurname());
+        System.out.println("Email: " + emp1.getEmail());
+        System.out.println("Salary: " + emp1.getSalary());
         System.out.println();
 
 
@@ -44,8 +51,8 @@ public class Main {
         System.out.println("Usage of optional attribute: ");
         var license1 = emp1.getLicenseNumber();
         var license2 = emp2.getLicenseNumber();
-        System.out.println("First employee license number " + (license1.isPresent() ? license1.get() : "No license"));
-        System.out.println("Second employee license number " + (license2.isPresent() ? license2.get() : "No license"));
+        System.out.println("First employee license number: " + (license1.isPresent() ? license1.get() : "no license"));
+        System.out.println("Second employee license number: " + (license2.isPresent() ? license2.get() : "no license"));
         System.out.println();
 
 

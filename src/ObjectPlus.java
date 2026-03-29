@@ -3,7 +3,7 @@ import java.util.*;
 
 public abstract class ObjectPlus implements Serializable {
 
-    private static Map<Class<?>, List<ObjectPlus>> extents = new HashMap<>();
+    private static Map<Class<? extends ObjectPlus>, List<ObjectPlus>> extents = new HashMap<>();
 
     public ObjectPlus() {
         if (!extents.containsKey(this.getClass())) {
@@ -12,25 +12,26 @@ public abstract class ObjectPlus implements Serializable {
         extents.get(this.getClass()).add(this);
     }
 
-    public static void saveAll(ObjectOutputStream stream) throws IOException {
-        stream.writeObject(extents);
+    public static void saveAll(String path) throws IOException {
+        try (ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(path))) {
+            stream.writeObject(extents);
+        }
     }
 
     @SuppressWarnings("unchecked")
-    public static void loadAll(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        extents = (Map<Class<?>, List<ObjectPlus>>)stream.readObject();
+    public static void loadAll(String path) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream stream = new ObjectInputStream(new FileInputStream(path))) {
+            extents.clear();
+            extents = (Map<Class<? extends ObjectPlus>, List<ObjectPlus>>)stream.readObject();
+        }
     }
 
     public static void saveAll() throws IOException {
-        try (ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(".extent"))) {
-            saveAll(stream);
-        }
+        saveAll(".extent");
     }
 
     public static void loadAll() throws IOException, ClassNotFoundException {
-        try (ObjectInputStream stream = new ObjectInputStream(new FileInputStream(".extent"))) {
-            loadAll(stream);
-        }
+        loadAll(".extent");
     }
 
     public static void print() {
@@ -46,7 +47,12 @@ public abstract class ObjectPlus implements Serializable {
         extents.clear();
     }
 
-    public static Optional<List<ObjectPlus>> get(Class<?> forClass) {
-        return Optional.ofNullable(extents.get(forClass));
+    @SuppressWarnings("unchecked")
+    public static<T extends ObjectPlus> List<T> get(Class<? extends ObjectPlus> forClass) throws ClassNotFoundException {
+        List<ObjectPlus> classExtent = extents.get(forClass);
+        if (classExtent == null) {
+            throw new ClassNotFoundException("Couldn't find the class extent for the " + forClass.getName() + ".");
+        }
+        return classExtent.stream().map((ObjectPlus o) -> (T) forClass.cast(o)).toList();
     }
 }
